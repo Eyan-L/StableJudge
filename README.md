@@ -74,11 +74,4 @@ pip install -r requirements.txt  # 请确保列出依赖项
 
 ## 📝 引用与声明
 本项目旨在提升 AI 系统对提示注入攻击的防御能力，供研究目的使用。请确保遵守相关大模型使用协议。
-
----
-
-### 💡 建议你在 Github 上的操作：
-1.  **提交代码**：记得在本地 commit 你的代码，并 `git push` 到你的远程仓库。
-2.  **编写 `requirements.txt`**：在终端运行 `pip freeze > requirements.txt`，把这个文件传到 GitHub 上，这样以后你想在别的电脑上跑，直接 `pip install -r requirements.txt` 即可。
-
-你的项目看起来非常专业，写完 README 之后，它就是一个非常标准的优秀科研项目了！加油！
+样以后你想在别的电脑上跑，直接 `pip install -r requirements.txt` 即可。
