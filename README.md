@@ -40,11 +40,6 @@ StableJudge 是一个旨在解决大语言模型（LLM）评审场景下提示�
 
 ## ⚡ 快速开始
 
-### 环境依赖
-```bash
-pip install -r requirements.txt  # 请确保列出依赖项
-```
-
 ### 训练流程
 1.  **数据构建**: 生成高质量 SFT 教材与 DPO 错题本。
     ```bash
