@@ -1,0 +1,49 @@
+### 模型配置
+model_name_or_path: /workspace/Processing/models/Qwen2.5-7B-Instruct
+trust_remote_code: true
+
+### 方法配置
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all
+
+### 数据配置
+dataset: stablejudge_sft
+dataset_dir: /workspace/Processing/agent
+template: qwen
+cutoff_len: 2048
+
+# --- 修改 1: 使用更多数据 ---
+max_samples: 5000
+packing: false
+overwrite_cache: true
+preprocessing_num_workers: 4
+
+### 输出配置
+output_dir: /workspace/Processing/models/qwen2.5_agent_sft_lora
+logging_steps: 10
+save_steps: 100
+plot_loss: true
+overwrite_output_dir: true
+
+### 训练超参数
+per_device_train_batch_size: 8
+gradient_accumulation_steps: 4
+
+# --- 修改 2: 保持稳健学习率 ---
+learning_rate: 5.0e-5
+
+# --- 修改 3: 增加轮数以学习复杂的 Review 风格 ---
+num_train_epochs: 4.0
+
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+flash_attn: auto
+
+### 评估配置
+val_size: 0.05
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 50

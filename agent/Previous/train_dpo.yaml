@@ -1,0 +1,47 @@
+### 模型配置
+# 加载 SFT 后的 LoRA 适配器作为起点
+model_name_or_path: /workspace/Processing/models/Qwen2.5-7B-Instruct
+adapter_name_or_path: /workspace/Processing/models/qwen2.5_agent_sft_lora
+trust_remote_code: true
+
+### 方法配置
+stage: dpo
+do_train: true
+finetuning_type: lora
+lora_target: all
+
+# --- 关键修改：参数名变更 ---
+pref_beta: 0.1          # 原 dpo_beta
+pref_loss: sigmoid      # 原 dpo_loss
+
+### 数据配置
+dataset: stablejudge_dpo
+dataset_dir: /workspace/Processing/agent
+template: qwen
+cutoff_len: 2048
+max_samples: 4000
+overwrite_cache: true
+preprocessing_num_workers: 4
+
+### 输出配置
+output_dir: /workspace/Processing/models/qwen2.5_agent_dpo_lora
+logging_steps: 5
+save_steps: 50
+plot_loss: true
+overwrite_output_dir: true
+
+### 训练超参数
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 1.0e-6
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+flash_attn: auto
+
+### 评估配置
+val_size: 0.1
+per_device_eval_batch_size: 2
+eval_strategy: steps
+eval_steps: 50

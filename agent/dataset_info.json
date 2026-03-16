@@ -1,0 +1,83 @@
+{
+  "stablejudge_sft": {
+    "file_name": "../data/sft_tool_training_data.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system",
+      "observation_tag": "tool" 
+    }
+  },
+  "stablejudge_dpo": {
+    "file_name": "../data/dpo_training_data.json",
+    "formatting": "sharegpt",
+    "ranking": true,
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system",
+      "observation_tag": "tool"
+    }
+  },
+  "stablejudge_sft_final": {
+    "file_name": "../data/sft_consensus_final.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system",
+      "observation_tag": "tool"
+    }
+  },
+  "stablejudge_sft_abstract": {
+    "file_name": "../data/sft_consensus_ten_scale.json",
+    "formatting": "sharegpt",
+    "columns": {
+      "messages": "conversations"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system",
+      "observation_tag": "tool"
+    }
+  },
+  "stablejudge_dpo_procedural": {
+    "file_name": "../data/dpo_consensus_ten_scale.json",
+    "formatting": "sharegpt",
+    "ranking": true,
+    "columns": {
+      "messages": "conversations",
+      "chosen": "chosen",
+      "rejected": "rejected"
+    },
+    "tags": {
+      "role_tag": "from",
+      "content_tag": "value",
+      "user_tag": "user",
+      "assistant_tag": "assistant",
+      "system_tag": "system",
+      "observation_tag": "tool"
+    }
+  }
+}

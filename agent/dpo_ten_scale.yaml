@@ -1,0 +1,52 @@
+### 模型配置
+# [修改] 指向新下载的 Qwen3 路径
+model_name_or_path: ../models/Qwen3-8B
+# [重要] 必须指向你刚训练好的 Qwen3 版 SFT 适配器，不能用 2.5 的
+adapter_name_or_path: ../models/qwen3_agent_sft_abstract_lora
+trust_remote_code: true
+
+### 方法配置
+stage: dpo
+do_train: true
+finetuning_type: lora
+lora_target: all
+# DPO 特有参数
+pref_beta: 0.01          # 保持 0.01，防止 Qwen3 产生过度的工具调用强迫症
+pref_loss: sigmoid
+
+### 数据配置
+# 确保该数据集已在 dataset_info.json 中注册，且分数已转为十分制
+dataset: stablejudge_dpo_procedural
+dataset_dir: ../agent
+# Qwen3 在 LLaMA-Factory 中通常沿用 qwen 模板或使用最新的 qwen3 模板
+template: qwen
+cutoff_len: 4096
+max_samples: 8000
+overwrite_cache: true
+preprocessing_num_workers: 4
+
+### 输出配置
+# [修改] 输出目录标记为 qwen3
+output_dir: ../models/qwen3_agent_dpo_abstract_lora
+logging_steps: 5
+save_steps: 100
+plot_loss: true
+overwrite_output_dir: true
+
+### 训练超参数
+# 8B 模型 DPO 较占显存，保持 batch 1 配合高累积步数
+per_device_train_batch_size: 1
+gradient_accumulation_steps: 16
+learning_rate: 5.0e-7   # [微调] Qwen3 更加敏感，建议学习率比 2.5 稍微再降一点
+num_train_epochs: 1.0   # DPO 通常 1 轮就足够纠正逻辑错误
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+flash_attn: auto
+
+### 评估配置
+gradient_checkpointing: true
+val_size: 0.05
+per_device_eval_batch_size: 1
+eval_strategy: steps
+eval_steps: 50

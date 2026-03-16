@@ -1,0 +1,49 @@
+### 模型配置
+# [修改] 指向新下载的 Qwen3 路径
+model_name_or_path: ../models/Qwen3-8B
+trust_remote_code: true
+
+### 方法配置
+stage: sft
+do_train: true
+finetuning_type: lora
+lora_target: all
+
+### 数据配置
+# 使用你之前转换好的十分制摘要数据集
+dataset: stablejudge_sft_abstract
+dataset_dir: ../agent
+# Qwen3 依然使用 qwen 模板
+template: qwen
+cutoff_len: 4096
+max_samples: 4000
+packing: false
+overwrite_cache: true
+preprocessing_num_workers: 4
+
+### 输出配置
+# [修改] 更换输出目录，标记为 qwen3 
+output_dir: ../models/qwen3_agent_sft_abstract_lora
+logging_steps: 10
+save_steps: 100
+plot_loss: true
+overwrite_output_dir: true
+
+### 训练超参数
+# 8B 模型在 BF16 模式下建议保持 batch 为 4，如果 OOM 则改为 2 并翻倍 gradient_accumulation
+per_device_train_batch_size: 4
+gradient_accumulation_steps: 4
+learning_rate: 5.0e-5
+num_train_epochs: 3.0
+lr_scheduler_type: cosine
+warmup_ratio: 0.1
+bf16: true
+flash_attn: auto
+
+### 评估配置
+# 8B 模型全精度微调务必开启梯度检查点
+gradient_checkpointing: true
+val_size: 0.05
+per_device_eval_batch_size: 4
+eval_strategy: steps
+eval_steps: 100

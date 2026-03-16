@@ -1,0 +1,89 @@
+{
+  "builder_name": "json",
+  "citation": "",
+  "config_name": "default",
+  "dataset_name": "review-5_k",
+  "dataset_size": 312721139,
+  "description": "",
+  "download_checksums": {
+    "hf://datasets/WestlakeNLP/Review-5K@557ca729d8d1edfafc38dff7f0307cd3e5a3e4d3/data/train.jsonl": {
+      "num_bytes": 268780863,
+      "checksum": null
+    },
+    "hf://datasets/WestlakeNLP/Review-5K@557ca729d8d1edfafc38dff7f0307cd3e5a3e4d3/data/test.jsonl": {
+      "num_bytes": 50037975,
+      "checksum": null
+    }
+  },
+  "download_size": 318818838,
+  "features": {
+    "messages": {
+      "feature": {
+        "role": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "content": {
+          "dtype": "string",
+          "_type": "Value"
+        }
+      },
+      "_type": "List"
+    },
+    "rates": {
+      "feature": {
+        "dtype": "int64",
+        "_type": "Value"
+      },
+      "_type": "List"
+    },
+    "review_contexts": {
+      "feature": {
+        "content": {
+          "dtype": "string",
+          "_type": "Value"
+        },
+        "rate": {
+          "dtype": "string",
+          "_type": "Value"
+        }
+      },
+      "_type": "List"
+    },
+    "decision": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "title": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "id": {
+      "dtype": "string",
+      "_type": "Value"
+    }
+  },
+  "homepage": "",
+  "license": "",
+  "size_in_bytes": 631539977,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 263639916,
+      "num_examples": 4189,
+      "dataset_name": "review-5_k"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 49081223,
+      "num_examples": 781,
+      "dataset_name": "review-5_k"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

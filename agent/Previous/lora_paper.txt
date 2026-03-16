@@ -1,0 +1,70 @@
+Title: LoRA: Low-Rank Adaptation of Large Language Models
+
+Authors: Edward J. Hu, Yelong Shen, Phillip Wallis, Zeyuan Allen-Zhu, Yuanzhi Li, Shean Wang, Lu Wang, Weizhu Chen
+
+ABSTRACT
+
+Natural language processing contains many applications with large-scale pre-training and fine-tuning. One of the major challenges with these large models is the computational cost of fine-tuning. In this paper, we propose Low-Rank Adaptation, or LoRA, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks. Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times. LoRA performs on-par or better than fine-tuning in model quality on RoBERTa, DeBERTa, GPT-2, and GPT-3, despite having fewer trainable parameters, a higher training throughput, and, unlike adapters, no additional inference latency. We also provide an empirical investigation into the rank-deficiency in language model adaptation, which sheds light on the efficacy of LoRA.
+
+1. INTRODUCTION
+
+Pre-trained Language Models (PLMs) have become the backbone of many NLP tasks. The standard paradigm is to pre-train a model on large-scale general domain data and then fine-tune it on specific downstream tasks. However, as models grow larger (e.g., GPT-3 with 175 billion parameters), fine-tuning all parameters becomes prohibitively expensive in terms of storage and computation. For instance, fine-tuning GPT-3 requires storing a separate copy of the 175B parameters for each task, which is impractical for real-world deployment.
+
+Existing solutions to this problem, such as adapter layers or prefix tuning, aim to reduce the number of trainable parameters. However, these methods often introduce inference latency (due to sequential processing in adapters) or reduce the model's usable sequence length (in prefix tuning).
+
+In this work, we take inspiration from the hypothesis that the change in weights during model adaptation has a low "intrinsic rank". We propose Low-Rank Adaptation (LoRA), which allows us to train some dense layers in a neural network indirectly by optimizing rank decomposition matrices of the dense layers' change during adaptation instead, while keeping the pre-trained weights frozen.
+
+2. PROBLEM STATEMENT
+
+Our goal is to find an efficient way to adapt a pre-trained model to a downstream task. Let W0 be the pre-trained weight matrix of dimensions d x k. Standard fine-tuning updates W0 to W0 + delta_W by optimizing the full delta_W matrix. This is expensive because delta_W has the same number of parameters as W0.
+
+We propose to parameterize the update delta_W by a low-rank decomposition delta_W = B x A, where B is a matrix of dimensions d x r, A is a matrix of dimensions r x k, and the rank r is much smaller than min(d, k). During training, W0 is frozen and does not receive gradient updates, while A and B contain trainable parameters. Note that both W0 and delta_W = BA are multiplied with the same input x, and their respective output vectors are summed coordinate-wise. For h = W0 x, our modified forward pass yields:
+
+h = W0 x + delta_W x = W0 x + B A x
+
+We initialize A with random Gaussian initialization and B with zero, so delta_W = B A is zero at the beginning of training. We then scale delta_W x by alpha / r, where alpha is a constant in r.
+
+3. AREN'T EXISTING SOLUTIONS GOOD ENOUGH?
+
+We analyze two common strategies for efficient adaptation: Adapter Layers and Prefix Tuning.
+
+Adapter Layers: Adatpers introduce extra layers (typically a projection down and a projection up) inside the Transformer blocks. While they reduce parameter count, our experiments show they introduce significant inference latency. For example, on a single GPU, we observe a 14-30% increase in latency for GPT-2 generation, which is unacceptable for latency-critical applications. This is because adapters must be processed sequentially.
+
+Prefix Tuning: This method optimizes continuous task-specific vectors (prefixes). However, we find that prefix tuning is difficult to optimize and that its performance changes non-monotonically with the number of trainable parameters. Furthermore, by reserving part of the sequence length for the prefix, it effectively reduces the context window available for processing the actual input.
+
+LoRA addresses both issues: it has no inference latency because the matrices B and A can be merged into W0 explicitly after training (W_new = W0 + B A), and it does not reduce the context window.
+
+4. OUR METHOD: LORA
+
+LoRA possesses several key advantages:
+
+1. A pre-trained model can be shared and used to build many small LoRA modules for different tasks. We can freeze the shared model and efficiently switch tasks by replacing the matrices A and B in memory, significantly reducing storage overhead and task-switching cost.
+
+2. LoRA makes training more efficient and lowers the hardware barrier to entry by up to 3 times, as we do not need to calculate the gradients or maintain the optimizer states for most parameters. Instead, we only optimize the much smaller low-rank matrices.
+
+3. Our simple linear design allows us to merge the trainable matrices with the frozen weights when deployed, introducing no inference latency compared to a fully fine-tuned model, by construction.
+
+4. LoRA is orthogonal to many prior methods and can be combined with many of them, such as prefix-tuning.
+
+Applying LoRA to Transformer:
+In a Transformer architecture, there are four weight matrices in the self-attention module (W_q, W_k, W_v, W_o) and two in the MLP module. We limit our study to adapting the attention weights for simplicity. We find that adapting both W_q and W_v yields the best results for a given budget of trainable parameters.
+
+5. EMPIRICAL EXPERIMENTS
+
+We evaluate LoRA on RoBERTa (base and large), DeBERTa (XXL), GPT-2 (medium and large), and GPT-3 (175B).
+
+Results on RoBERTa and DeBERTa:
+On the GLUE benchmark, LoRA matches or exceeds the performance of full fine-tuning. For example, on RoBERTa Large, full fine-tuning achieves an average score of 88.6, while LoRA (with roughly 0.5% of trainable parameters) achieves 88.7.
+
+Results on GPT-3:
+We evaluate on the E2E NLG Challenge, WebNLG, and DART datasets.
+- On E2E NLG, GPT-3 fine-tuned achieves a BLEU score of 68.3. LoRA achieves 68.6.
+- On WebNLG, GPT-3 fine-tuned achieves 58.7 BLEU. LoRA achieves 59.4 BLEU.
+- Crucially, LoRA outperforms Adapter approaches significantly. For instance, Adapter layers achieve only 62.3 BLEU on E2E NLG with a similar parameter budget.
+
+Scaling Rank r:
+We investigate the effect of rank r. Surprisingly, we find that a very small rank (e.g., r=4 or r=8) suffices for adapting GPT-3. Increasing r to 64 does not yield significant performance gains. This supports our hypothesis that the weight updates during adaptation indeed have a low "intrinsic rank".
+
+6. CONCLUSION
+
+We proposed LoRA, an efficient adaptation strategy that neither introduces inference latency nor reduces input sequence length while retaining high model quality. It allows the efficient adaptation of massive models like GPT-3 with significantly reduced hardware requirements. Our empirical results show that LoRA performs on par or better than full fine-tuning and outperforms prior parameter-efficient methods. The observation that adaptation matrices are rank-deficient suggests that large language models are actually easier to adapt to specific tasks than previously thought.
