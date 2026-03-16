@@ -20,7 +20,7 @@ StableJudge 是一个旨在解决大语言模型（LLM）评审场景下提示�
 ## 🛠️ 技术栈 (Tech Stack)
 
 *   **训练框架**: [LLaMA-Factory](https://github.com/hiyouga/LLaMA-Factory) (SFT & DPO)
-*   **推理引擎**: Qwen2.5-7B-Instruct
+*   **推理引擎**: Qwen3-7B-Instruct
 *   **安全防御**: 基于 DistilBERT 的多模态标注模型与语义 Verifier
 *   **特征提取**: Sentence-Transformers, spaCy
 *   **训练策略**: 监督微调 (SFT) + 直接偏好优化 (DPO)
